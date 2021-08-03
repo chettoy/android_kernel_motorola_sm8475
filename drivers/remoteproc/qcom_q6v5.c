@@ -42,6 +42,11 @@ struct symbol_entry {
 
 static struct rb_root symbol_tree = RB_ROOT;
 #endif
+
+static char qcom_ssr_reason[256];
+static char *ssr_reason = qcom_ssr_reason;
+module_param(ssr_reason, charp, S_IRUGO);
+
 /**
  * qcom_q6v5_prepare() - reinitialize the qcom_q6v5 context before start
  * @q6v5:	reference to qcom_q6v5 context to be reinitialized
@@ -303,6 +308,9 @@ static irqreturn_t q6v5_wdog_interrupt(int irq, void *data)
 
 	q6v5->running = false;
 	trace_rproc_qcom_event(dev_name(q6v5->dev), "q6v5_wdog", msg);
+
+	strlcpy(qcom_ssr_reason, msg, min((size_t)len, (size_t)sizeof(qcom_ssr_reason)));
+
 	if (q6v5->rproc->recovery_disabled) {
 		schedule_work(&q6v5->crash_handler);
 	} else {
@@ -344,6 +352,9 @@ static irqreturn_t q6v5_fatal_interrupt(int irq, void *data)
 		dev_err(q6v5->dev, "Failed to queue symbol loader work\n");
 	}
 #endif
+
+	strlcpy(qcom_ssr_reason, msg, min((size_t)len, (size_t)sizeof(qcom_ssr_reason)));
+
 	q6v5->running = false;
 	trace_rproc_qcom_event(dev_name(q6v5->dev), "q6v5_fatal", msg);
 	if (q6v5->rproc->recovery_disabled) {
