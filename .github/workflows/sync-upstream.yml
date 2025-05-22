@@ -14,9 +14,15 @@ jobs:
     - uses: actions/checkout@master
       with:
         fetch-depth: 0  # Fetch all history for rebase
+        submodules: true
     - name: Get initial hash
       id: get-initial-hash
       run: echo "init_hash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+    - name: Update lindroid-drm-loopback
+      run: |
+        git -C drivers/lindroid-drm fetch -a -t
+        git -C drivers/lindroid-drm checkout origin/master
+        test -n "$(git diff)" && git add drivers/lindroid-drm && git commit -m "Update lindroid-drm-loopback" || echo "No need to update"
     - uses: archiemeng/rebase-upstream-action@master
       with:
         branch: ${{ github.ref_name }}
