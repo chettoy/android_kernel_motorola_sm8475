@@ -1,3 +1,6 @@
 [submodule "drivers/lindroid-drm"]
 	path = drivers/lindroid-drm
 	url = https://github.com/Linux-on-LineageOS/lindroid-drm-loopback
+[submodule "KernelSU"]
+	path = KernelSU
+	url = https://github.com/tiann/KernelSU
